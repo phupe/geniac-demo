@@ -11,7 +11,7 @@ else()
 
     ExternalProject_Add(
         helloWorld
-        SOURCE_DIR ${CMAKE_SOURCE_DIR}/modules/helloWorld
+        SOURCE_DIR ${pipeline_source_dir}/modules/helloWorld
         CMAKE_ARGS
             -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/externalProject/bin)
 
