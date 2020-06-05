@@ -278,7 +278,7 @@ process fastqc {
   script:
   pbase = reads[0].toString() - ~/(\.fq)?(\.fastq)?(\.gz)?$/
   """
-  fastqc ${params.fastqcOpts} $reads
+  fastqc -q $reads
   mv ${pbase}_fastqc.html ${prefix}_fastqc.html
   mv ${pbase}_fastqc.zip ${prefix}_fastqc.zip
   """
@@ -388,7 +388,7 @@ process trickySoftware {
 
   script:
   """
-  python ${params.trickySoftwareOpts} > trickySoftwareResults.txt 2>&1
+  python --version > trickySoftwareResults.txt 2>&1
   """
 }
 
