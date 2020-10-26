@@ -89,6 +89,7 @@ if( !(workflow.runName ==~ /[a-z]+_[a-z]+/) ){
 // Stage config files
 multiqcConfigCh = Channel.fromPath(params.multiqcConfig)
 outputDocsCh = Channel.fromPath("$baseDir/docs/output.md")
+outputDocsImagesCh = file("$baseDir/docs/images/", checkIfExists: true)
 pcaHeaderCh = Channel.fromPath("$baseDir/assets/pcaHeader.txt")
 heatmapHeaderCh = Channel.fromPath("$baseDir/assets/heatmapHeader.txt")
 
@@ -411,7 +412,7 @@ process outputDocumentation {
 
   input:
   file outputDocs from outputDocsCh
-  //file images from outputDocsImagesCh
+  file images from outputDocsImagesCh
 
   output:
   file "resultsDescription.html"
