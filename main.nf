@@ -449,12 +449,12 @@ workflow.onComplete {
 
   // Render the TXT template
   def engine = new groovy.text.GStringTemplateEngine()
-  def tf = new File("$baseDir/assets/onCompleteTemplate.txt")
+  def tf = new File("$baseDir/assets/workflowOnCompleteTemplate.txt")
   def txtTemplate = engine.createTemplate(tf).make(reportFields)
   def reportTxt = txtTemplate.toString()
 
   // Render the HTML template
-  def hf = new File("$baseDir/assets/onCompleteTemplate.html")
+  def hf = new File("$baseDir/assets/workflowOnCompleteTemplate.html")
   def htmlTemplate = engine.createTemplate(hf).make(reportFields)
   def reportHtml = htmlTemplate.toString()
 
@@ -468,8 +468,8 @@ workflow.onComplete {
   def outputTxtFile = new File( outputSummaryDir, "pipelineReport.txt" )
   outputTxtFile.withWriter { w -> w << reportTxt }
 
-  // onComplete file
-  File woc = new File("${params.outDir}/onComplete.txt")
+  // workflowOnComplete file
+  File woc = new File("${params.outDir}/workflowOnComplete.txt")
   Map endSummary = [:]
   endSummary['Completed on'] = workflow.complete
   endSummary['Duration']     = workflow.duration
