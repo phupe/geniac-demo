@@ -90,8 +90,6 @@ if( !(workflow.runName ==~ /[a-z]+_[a-z]+/) ){
 multiqcConfigCh = Channel.fromPath(params.multiqcConfig)
 outputDocsCh = Channel.fromPath("$baseDir/docs/output.md")
 outputDocsImagesCh = file("$baseDir/docs/images/", checkIfExists: true)
-pcaHeaderCh = Channel.fromPath("$baseDir/assets/pcaHeader.txt")
-heatmapHeaderCh = Channel.fromPath("$baseDir/assets/heatmapHeader.txt")
 
 /************
  * CHANNELS *
@@ -197,17 +195,17 @@ if (params.design){
   Channel
     .fromPath(params.design)
     .ifEmpty { exit 1, "Design file not found: ${params.design}" }
-    .into { chDesignCheck }
+    .into { designCheckCh }
 
-  chDesignControl
-    .splitCsv(header:true)
-    .map { row ->
-      if(row.CONTROLID==""){row.CONTROLID='NO_INPUT'}
-      return [ row.SAMPLEID, row.CONTROLID, row.SAMPLENAME, row.GROUP, row.PEAKTYPE ]
-     }
-    .set { chDesignControl }
+ // Channel
+ //   .splitCsv(header:true)
+ //   .map { row ->
+ //     if(row.CONTROLID==""){row.CONTROLID='NO_INPUT'}
+ //     return [ row.SAMPLEID, row.CONTROLID, row.SAMPLENAME, row.GROUP, row.PEAKTYPE ]
+ //    }
+ //   .set { designCheckCh2 }
 }else{
-  chDesignCheck = Channel.empty()
+  designCheckCh = Channel.empty()
 }
 
 /*******************
@@ -238,31 +236,6 @@ log.info summary.collect { k,v -> "${k.padRight(15)}: $v" }.join("\n")
 log.info "========================================="
 
 // TODO - ADD YOUR NEXTFLOW PROCESS HERE
-
-
-
-process workflowSummaryMqc {
-
-  output:
-  file 'workflowSummaryMqc.yaml' into workflowSummaryYaml
-
-  exec:
-  def yamlFile = task.workDir.resolve('workflowSummaryMqc.yaml')
-  yamlFile.text  = """
-  id: 'summary'
-  description: " - this information is collected when the pipeline is started."
-  section_name: 'Workflow Summary'
-  section_href: 'https://gitlab.curie.fr/rnaseq'
-  plot_type: 'html'
-  data: |
-      <dl class=\"dl-horizontal\">
-${summary.collect { k,v -> "            <dt>$k</dt><dd><samp>${v ?: '<span style=\"color:#999999;\">N/A</a>'}</samp></dd>" }.join("\n")}
-      </dl>
-  """.stripIndent()
-}
-
-
-
 
 /*
  * FastQC
