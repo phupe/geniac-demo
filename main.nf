@@ -246,32 +246,6 @@ log.info "========================================="
 
 // TODO - ADD YOUR NEXTFLOW PROCESS HERE
 
-/***********
- * MultiQC *
- ***********/
-
-process getSoftwareVersions{
-  label 'python'
-  label 'lowCpu'
-  label 'lowMem'
-  publishDir path: "${params.outDir}/software_versions", mode: "copy"
-
-  when:
-  !params.skipSoftVersions
-
-  input:
-  file 'v_fastqc.txt' from fastqcVersionCh.first().ifEmpty([])
-
-  output:
-  file 'software_versions_mqc.yaml' into softwareVersionsYamlCh
-
-  script:
-  """
-  echo $workflow.manifest.version &> v_pipeline.txt
-  echo $workflow.nextflow.version &> v_nextflow.txt
-  scrape_software_versions.py &> software_versions_mqc.yaml
-  """
-}
 
 /*
  * FastQC
@@ -299,6 +273,33 @@ process fastqc {
   fastqc --version > v_fastqc.txt
   mv ${pbase}_fastqc.html ${prefix}_fastqc.html
   mv ${pbase}_fastqc.zip ${prefix}_fastqc.zip
+  """
+}
+
+/***********
+ * MultiQC *
+ ***********/
+
+process getSoftwareVersions{
+  label 'python'
+  label 'lowCpu'
+  label 'lowMem'
+  publishDir path: "${params.outDir}/software_versions", mode: "copy"
+
+  when:
+  !params.skipSoftVersions
+
+  input:
+  file 'v_fastqc.txt' from fastqcVersionCh.first().ifEmpty([])
+
+  output:
+  file 'software_versions_mqc.yaml' into softwareVersionsYamlCh
+
+  script:
+  """
+  echo $workflow.manifest.version &> v_pipeline.txt
+  echo $workflow.nextflow.version &> v_nextflow.txt
+  scrape_software_versions.py &> software_versions_mqc.yaml
   """
 }
 
