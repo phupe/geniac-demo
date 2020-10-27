@@ -125,13 +125,13 @@ if(params.samplePlan){
       .from(file("${params.samplePlan}"))
       .splitCsv(header: false)
       .map{ row -> [ row[0], [file(row[2])]] }
-      .set { rawReadsFastqc }
+      .set { rawReadsFastqcCh }
   }else{
     Channel
       .from(file("${params.samplePlan}"))
       .splitCsv(header: false)
       .map{ row -> [ row[0], [file(row[2]), file(row[3])]] }
-      .set { rawReadsFastqc }
+      .set { rawReadsFastqcCh }
    }
   params.reads=false
 }
@@ -141,19 +141,19 @@ else if(params.readPaths){
       .from(params.readPaths)
       .map { row -> [ row[0], [file(row[1][0])]] }
       .ifEmpty { exit 1, "params.readPaths was empty - no input files supplied." }
-      .set { rawReadsFastqc }
+      .set { rawReadsFastqcCh }
   } else {
     Channel
       .from(params.readPaths)
       .map { row -> [ row[0], [file(row[1][0]), file(row[1][1])]] }
       .ifEmpty { exit 1, "params.readPaths was empty - no input files supplied." }
-      .set { rawReadsFastqc }
+      .set { rawReadsFastqcCh }
   }
 } else {
   Channel
     .fromFilePairs( params.reads, size: params.singleEnd ? 1 : 2 )
     .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nNB: Path requires at least one * wildcard!\nIf this is single-end data, please specify --singleEnd on the command line." }
-    .set { rawReadsFastqc }
+    .set { rawReadsFastqcCh }
 }
 
 // Make sample plan if not available

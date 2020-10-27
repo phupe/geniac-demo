@@ -97,7 +97,7 @@ if( !(workflow.runName ==~ /[a-z]+_[a-z]+/) ){
 
 // Stage config files
 multiqcConfigCh = Channel.fromPath(params.multiqcConfig)
-outputDocsCh = Channel.fromPath("$baseDir/docs/output.md")
+outputDocsCh = file("$baseDir/docs/output.md", checkIfExists: true)
 outputDocsImagesCh = file("$baseDir/docs/images/", checkIfExists: true)
 
 /************
@@ -244,12 +244,11 @@ summary['Config Profile'] = workflow.profile
 log.info summary.collect { k,v -> "${k.padRight(15)}: $v" }.join("\n")
 log.info "========================================="
 
-// TODO - ADD YOUR NEXTFLOW PROCESS HERE
+// ADD YOUR NEXTFLOW PROCESS HERE
 
-
-/*
- * FastQC
- */
+/**********
+ * FastQC *
+ **********/
 process fastqc {
   label 'fastqc'
   label 'smallMem'
@@ -276,9 +275,114 @@ process fastqc {
   """
 }
 
-/***********
- * MultiQC *
- ***********/
+/**********
+ * alpine *
+ **********/
+// example with local variable
+oneToFiveCh = Channel.of(1..5)
+process alpine {
+  label 'alpine'
+  label 'smallMem'
+  label 'smallCpu'
+  publishDir "${params.outDir}/alpine", mode: 'copy'
+
+  input:
+  val x from oneToFiveCh
+
+  output:
+  file "alpine_*"
+
+  script:
+  """
+  source ${baseDir}/env/alpine.env
+  echo "Hello from alpine: \$(date). This is very high here: \${peak_height}!" > alpine_${x}.txt
+  """
+}
+
+/******************************
+ * helloWord from source code *
+ ******************************/
+
+process helloWorld {
+  label 'helloWorld'
+  label 'smallMem'
+  label 'smallCpu'
+  publishDir "${params.outDir}/helloWorld", mode: 'copy'
+
+  output:
+  file "helloWorld.txt" into helloWorldOutputCh
+
+  script:
+  """
+  helloWorld > helloWorld.txt
+  """
+}
+
+/**************************************************
+ * process with onlyLinux (standard unix command) *
+ **************************************************/
+
+process standardUnixCommand {
+  label 'onlyLinux'
+  label 'smallMem'
+  label 'smallCpu'
+  publishDir "${params.outDir}/standardUnixCommand", mode: 'copy'
+
+  input:
+  file hello from helloWorldOutputCh
+
+  output:
+  file "bonjourMonde.txt"
+
+  script:
+  """
+  sed -e 's/Hello World/Bonjour Monde/g' ${hello} > bonjourMonde.txt
+  """
+}
+
+/**************************************************************
+ * process with onlylinux (invoke script from bin/ directory) *
+ **************************************************************/
+
+process execBinScript {
+  label 'onlyLinux'
+  label 'smallMem'
+  label 'smallCpu'
+  publishDir "${params.outDir}/execBinScript", mode: 'copy'
+
+  output:
+  file "execBinScriptResults_*"
+
+  script:
+  """
+  apMyscript.sh > execBinScriptResults_1.txt
+  someScript.sh > execBinScriptResults_2.txt
+  """
+}
+
+/***********************************************
+ * Some process with a software that has to be *
+ * installed with a custom conda yml file      *
+ ***********************************************/
+
+process trickySoftware {
+  label 'trickySoftware'
+  label 'smallMem'
+  label 'smallCpu'
+  publishDir "${params.outDir}/trickySoftware", mode: 'copy'
+
+  output:
+  file "trickySoftwareResults.txt"
+
+  script:
+  """
+  python --version > trickySoftwareResults.txt 2>&1
+  """
+}
+
+/*********************
+ * Software versions *
+ *********************/
 
 process getSoftwareVersions{
   label 'python'
@@ -303,112 +407,6 @@ process getSoftwareVersions{
   """
 }
 
-/*
- * alpine 
- */
-// example with local variable
-oneToFiveCh = Channel.of(1..5)
-process alpine {
-  label 'alpine'
-  label 'smallMem'
-  label 'smallCpu'
-  publishDir "${params.outDir}/alpine", mode: 'copy'
-
-  input:
-  val x from oneToFiveCh
-
-  output:
-  file "alpine_*"
-
-  script:
-  """
-  source ${baseDir}/env/alpine.env
-  echo "Hello from alpine: \$(date). This is very high here: \${peak_height}!" > alpine_${x}.txt
-  """
-}
-
-/*
- * helloWord from source code 
- */
-
-process helloWorld {
-  label 'helloWorld'
-  label 'smallMem'
-  label 'smallCpu'
-  publishDir "${params.outDir}/helloWorld", mode: 'copy'
-
-  output:
-  file "helloWorld.txt" into helloWorldOutputCh
-
-  script:
-  """
-  helloWorld > helloWorld.txt
-  """
-}
-
-
-/*
- * process with onlyLinux (standard unix command)
- */
-
-process standardUnixCommand {
-  label 'onlyLinux'
-  label 'smallMem'
-  label 'smallCpu'
-  publishDir "${params.outDir}/standardUnixCommand", mode: 'copy'
-
-  input:
-  file hello from helloWorldOutputCh
-
-  output:
-  file "bonjourMonde.txt"
-
-  script:
-  """
-  sed -e 's/Hello World/Bonjour Monde/g' ${hello} > bonjourMonde.txt
-  """
-}
-
-/*
- * process with onlylinux (invoke script from bin/ directory) 
- */
-
-process execBinScript {
-  label 'onlyLinux'
-  label 'smallMem'
-  label 'smallCpu'
-  publishDir "${params.outDir}/execBinScript", mode: 'copy'
-
-  output:
-  file "execBinScriptResults_*"
-
-  script:
-  """
-  apMyscript.sh > execBinScriptResults_1.txt
-  someScript.sh > execBinScriptResults_2.txt
-  """
-}
-
-/*
- * Some process with a software that has to be
- * installed with a custom conda yml file
- */
-
-
-process trickySoftware {
-  label 'trickySoftware'
-  label 'smallMem'
-  label 'smallCpu'
-  publishDir "${params.outDir}/trickySoftware", mode: 'copy'
-
-  output:
-  file "trickySoftwareResults.txt"
-
-  script:
-  """
-  python --version > trickySoftwareResults.txt 2>&1
-  """
-}
 
 /****************
  * Sub-routines *
@@ -419,7 +417,7 @@ process outputDocumentation {
   label 'lowCpu'
   label 'lowMem'
 
-  publishDir "${params.summaryDir}", mode: 'copy'
+  publishDir "${params.summaryDir}/", mode: 'copy'
 
   input:
   file outputDocs from outputDocsCh
