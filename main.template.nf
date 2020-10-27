@@ -204,17 +204,17 @@ if (params.design){
   Channel
     .fromPath(params.design)
     .ifEmpty { exit 1, "Design file not found: ${params.design}" }
-    .into { chDesignCheck }
+    .into { designCheckCh }
 
-  chDesignControl
+  designCheckCh
     .splitCsv(header:true)
     .map { row ->
       if(row.CONTROLID==""){row.CONTROLID='NO_INPUT'}
       return [ row.SAMPLEID, row.CONTROLID, row.SAMPLENAME, row.GROUP, row.PEAKTYPE ]
      }
-    .set { chDesignControl }
+    .set { designCheckCh }
 }else{
-  chDesignCheck = Channel.empty()
+  designCheckCh = Channel.empty()
 }
 
 /*******************

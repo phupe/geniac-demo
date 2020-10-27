@@ -33,10 +33,19 @@ def helpMessage() {
   @git_repo_name@ v${workflow.manifest.version}
   ======================================================================
 
-    Usage:
-    nextflow run rnaseq --reads '*_R{1,2}.fastq.gz' --genome hg19 -profile conda
-    nextflow run rnaseq --samplePlan samplePlan --genome hg19 -profile conda
+  Usage:
+  nextflow run main.nf --reads '*_R{1,2}.fastq.gz' --genome 'hg19' -profile conda
+  nextflow run main.nf --samplePlan samplePlan --genome 'hg19' -profile conda
 
+  Mandatory arguments:
+    --reads [file]                Path to input data (must be surrounded with quotes)
+    --samplePlan [file]           Path to sample plan input file (cannot be used with --reads)
+    --genome [str]                Name of genome reference
+    -profile [str]                Configuration profile to use. test / conda / multiconda / path / multipath / singularity / docker / cluster (see below)
+  
+  Inputs:
+    --design [file]               Path to design file for extended analysis  
+    --singleEnd [bool]            Specifies that the input is single-end reads
 
   Skip options: All are false by default
     --skipSoftVersion [bool]      Do not report software version
@@ -116,13 +125,13 @@ if(params.samplePlan){
       .from(file("${params.samplePlan}"))
       .splitCsv(header: false)
       .map{ row -> [ row[0], [file(row[2])]] }
-      .set { rawReadsFastqc }
+      .set { rawReadsFastqcCh }
   }else{
     Channel
       .from(file("${params.samplePlan}"))
       .splitCsv(header: false)
       .map{ row -> [ row[0], [file(row[2]), file(row[3])]] }
-      .set { rawReadsFastqc }
+      .set { rawReadsFastqcCh }
    }
   params.reads=false
 }
@@ -132,19 +141,19 @@ else if(params.readPaths){
       .from(params.readPaths)
       .map { row -> [ row[0], [file(row[1][0])]] }
       .ifEmpty { exit 1, "params.readPaths was empty - no input files supplied." }
-      .set { rawReadsFastqc }
+      .set { rawReadsFastqcCh }
   } else {
     Channel
       .from(params.readPaths)
       .map { row -> [ row[0], [file(row[1][0]), file(row[1][1])]] }
       .ifEmpty { exit 1, "params.readPaths was empty - no input files supplied." }
-      .set { rawReadsFastqc }
+      .set { rawReadsFastqcCh }
   }
 } else {
   Channel
     .fromFilePairs( params.reads, size: params.singleEnd ? 1 : 2 )
     .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nNB: Path requires at least one * wildcard!\nIf this is single-end data, please specify --singleEnd on the command line." }
-    .set { rawReadsFastqc }
+    .set { rawReadsFastqcCh }
 }
 
 // Make sample plan if not available
@@ -197,15 +206,15 @@ if (params.design){
     .ifEmpty { exit 1, "Design file not found: ${params.design}" }
     .into { designCheckCh }
 
-  designCheckCh
-    .splitCsv(header:true)
-    .map { row ->
-      if(row.CONTROLID==""){row.CONTROLID='NO_INPUT'}
-      return [ row.SAMPLEID, row.CONTROLID, row.SAMPLENAME, row.GROUP, row.PEAKTYPE ]
-     }
-    .set { designCheckCh }
-}else{
-  designCheckCh = Channel.empty()
+//   designControlCh
+//     .splitCsv(header:true)
+//     .map { row ->
+//       if(row.CONTROLID==""){row.CONTROLID='NO_INPUT'}
+//       return [ row.SAMPLEID, row.CONTROLID, row.SAMPLENAME, row.GROUP, row.PEAKTYPE ]
+//      }
+//     .set { designControlCh }
+// }else{
+//   designCheckCh = Channel.empty()
 }
 
 /*******************
@@ -237,6 +246,33 @@ log.info "========================================="
 
 // TODO - ADD YOUR NEXTFLOW PROCESS HERE
 
+/***********
+ * MultiQC *
+ ***********/
+
+process getSoftwareVersions{
+  label 'python'
+  label 'lowCpu'
+  label 'lowMem'
+  publishDir path: "${params.outDir}/software_versions", mode: "copy"
+
+  when:
+  !params.skipSoftVersions
+
+  input:
+  file 'v_fastqc.txt' from fastqcVersionCh.first().ifEmpty([])
+
+  output:
+  file 'software_versions_mqc.yaml' into softwareVersionsYamlCh
+
+  script:
+  """
+  echo $workflow.manifest.version &> v_pipeline.txt
+  echo $workflow.nextflow.version &> v_nextflow.txt
+  scrape_software_versions.py &> software_versions_mqc.yaml
+  """
+}
+
 /*
  * FastQC
  */
@@ -250,15 +286,17 @@ process fastqc {
       saveAs: {filename -> filename.indexOf(".zip") > 0 ? "zips/$filename" : "$filename"}
 
   input:
-  set val(prefix), file(reads) from rawReadsFastqc
+  set val(prefix), file(reads) from rawReadsFastqcCh
 
   output:
-  file "*_fastqc.{zip,html}" into fastqcResults
+  file "*_fastqc.{zip,html}" into fastqcResultsCh
+  file "v_fastqc.txt" into fastqcVersionCh
 
   script:
   pbase = reads[0].toString() - ~/(\.fq)?(\.fastq)?(\.gz)?$/
   """
   fastqc -q $reads
+  fastqc --version > v_fastqc.txt
   mv ${pbase}_fastqc.html ${prefix}_fastqc.html
   mv ${pbase}_fastqc.zip ${prefix}_fastqc.zip
   """
@@ -287,7 +325,6 @@ process alpine {
   echo "Hello from alpine: \$(date). This is very high here: \${peak_height}!" > alpine_${x}.txt
   """
 }
-
 
 /*
  * helloWord from source code 
@@ -377,7 +414,7 @@ process trickySoftware {
  ****************/
 
 process outputDocumentation {
-  label 'markdown'
+  label 'python'
   label 'lowCpu'
   label 'lowMem'
 
