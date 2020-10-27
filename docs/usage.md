@@ -111,8 +111,7 @@ For most of the steps in the pipeline, if the job exits with an error code of `1
 The pipeline is made with a few *skip* options that allow to skip optional steps in the workflow.
 The following options can be used:
 * `--skipFastqc`
-* `--skipMultiqc`
-				
+
 ### `--metadata`
 Specify a two-columns (tab-delimited) metadata file to diplay in the final Multiqc report.
 

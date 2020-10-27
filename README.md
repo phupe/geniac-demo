@@ -45,7 +45,6 @@ Inputs:
 
 Skip options: All are false by default
 --skipSoftVersion [bool]         Do not report software version
---skipMultiQC [bool]             Skip MultiQC
 
 Other options:
 --metadata [dir]                Add metadata file for multiQC report
