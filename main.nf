@@ -208,8 +208,8 @@ if (params.design){
   designControlCh
     .splitCsv(header:true)
     .map { row ->
-      if(row.CONTROLID==""){row.CONTROLID='NO_INPUT'}
-      return [ row.SAMPLEID, row.CONTROLID, row.SAMPLENAME, row.GROUP, row.PEAKTYPE ]
+      if(row.AGE==""){row.AGE='NA'}
+      return [ row.SAMPLE_ID, row.AGE, row.TYPE ]
      }
     .set { designControlCh }
 }else{
