@@ -204,17 +204,18 @@ if (params.design){
   Channel
     .fromPath(params.design)
     .ifEmpty { exit 1, "Design file not found: ${params.design}" }
-    .into { designCheckCh }
+    .into { designCheckCh ; designControlCh }
 
-//   designControlCh
-//     .splitCsv(header:true)
-//     .map { row ->
-//       if(row.CONTROLID==""){row.CONTROLID='NO_INPUT'}
-//       return [ row.SAMPLEID, row.CONTROLID, row.SAMPLENAME, row.GROUP, row.PEAKTYPE ]
-//      }
-//     .set { designControlCh }
-// }else{
-//   designCheckCh = Channel.empty()
+  designControlCh
+    .splitCsv(header:true)
+    .map { row ->
+      if(row.CONTROLID==""){row.CONTROLID='NO_INPUT'}
+      return [ row.SAMPLEID, row.CONTROLID, row.SAMPLENAME, row.GROUP, row.PEAKTYPE ]
+     }
+    .set { designControlCh }
+}else{
+  designCheckCh = Channel.empty()
+  designControlCh = Channel.empty()
 }
 
 /*******************
