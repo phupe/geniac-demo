@@ -81,7 +81,7 @@ if (params.help){
 
 // Configurable reference genomes
 
-// TODO - ADD HERE ANY ANNOTATION
+// ADD HERE ANY ANNOTATION
 
 if (params.genomes && params.genome && !params.genomes.containsKey(params.genome)) {
   exit 1, "The provided genome '${params.genome}' is not available in the genomes.config file. Currently the available genomes are ${params.genomes.keySet().join(", ")}"
@@ -197,13 +197,13 @@ if (params.samplePlan){
  * Design file *
  ***************/
 
-// TODO - UPDATE BASED ON YOUR DESIGN
+// UPDATE BASED ON YOUR DESIGN
 
 if (params.design){
   Channel
     .fromPath(params.design)
     .ifEmpty { exit 1, "Design file not found: ${params.design}" }
-    .into { designCheckCh ; designControlCh }
+    .into { designCh ; designControlCh }
 
   designControlCh
     .splitCsv(header:true)
@@ -213,7 +213,7 @@ if (params.design){
      }
     .set { designControlCh }
 }else{
-  designCheckCh = Channel.empty()
+  designCh = Channel.empty()
   designControlCh = Channel.empty()
 }
 
@@ -249,6 +249,7 @@ log.info "========================================="
 /**********
  * FastQC *
  **********/
+
 process fastqc {
   label 'fastqc'
   label 'smallMem'
@@ -279,6 +280,7 @@ process fastqc {
  * alpine *
  **********/
 // example with local variable
+
 oneToFiveCh = Channel.of(1..5)
 process alpine {
   label 'alpine'
@@ -397,13 +399,13 @@ process getSoftwareVersions{
   file 'v_fastqc.txt' from fastqcVersionCh.first().ifEmpty([])
 
   output:
-  file 'software_versions_mqc.yaml' into softwareVersionsYamlCh
+  file 'softwareVersionsMqc.yaml' into softwareVersionsYamlCh
 
   script:
   """
   echo $workflow.manifest.version &> v_pipeline.txt
   echo $workflow.nextflow.version &> v_nextflow.txt
-  scrape_software_versions.py &> software_versions_mqc.yaml
+  apScrapeSoftwareVersions.py &> softwareVersionsMqc.yaml
   """
 }
 
@@ -428,7 +430,7 @@ process outputDocumentation {
 
   script:
   """
-  markdown_to_html.py $outputDocs -o resultsDescription.html
+  apMarkdownToHtml.py $outputDocs -o resultsDescription.html
   """
 }
 
