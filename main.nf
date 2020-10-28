@@ -466,7 +466,7 @@ process checkDesign{
   script:
   optSE = params.singleEnd ? "--singleEnd" : ""
   """
-  #apCheckDesign.py -d $design -s $samplePlan --baseDir ${baseDir} ${optSE}
+  apCheckDesign.py -d $design -s $samplePlan ${optSE}
   """
 }
 

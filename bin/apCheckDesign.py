@@ -120,8 +120,8 @@ def checkColumnsMatch(col1, col2, exclusive=False):
 
 if __name__ == '__main__':
 
-    ## TODO - define your design header
-    designHeader=['SAMPLEID', 'CONTROLID', 'SAMPLENAME', 'GROUP', 'PEAKTYPE']
+    ## define your design header
+    designHeader=['SAMPLE_ID', 'AGE', 'TYPE']
 
     ## Get args
     inputDesign, inputSamplePlan, isSingleEnd = argsParse()
