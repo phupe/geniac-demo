@@ -430,8 +430,8 @@ process multiqc {
 
   output: 
   file splan
-  //file "*_report.html" into multiqcReportCh
-  //file "*_data"
+  file "*_report.html" into multiqcReportCh
+  file "*_data"
 
   script:
   rtitle = customRunName ? "--title \"$customRunName\"" : ''
