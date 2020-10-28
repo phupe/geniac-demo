@@ -27,9 +27,9 @@ for k, v in regexes.items():
 
 # Dump to YAML
 print ('''
-id: 'Chip-seq pipeline software versions'
-section_name: 'Software Versions'
-section_href: 'https://gitlab.curie.fr/data-analysis/chip-seq/t'
+id: 'Pipeline software versions'
+section_name: 'Software versions'
+section_href: 'https://geniac.readthedocs.io'
 plot_type: 'html'
 description: 'are collected at run time from the software output.'
 data: |
