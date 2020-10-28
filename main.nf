@@ -403,7 +403,7 @@ process getSoftwareVersions{
   """
   echo $workflow.manifest.version &> v_pipeline.txt
   echo $workflow.nextflow.version &> v_nextflow.txt
-  apScrapeSoftwareVersions.py &> softwareVersionsMqc.yaml
+  scrape_software_versions.py &> softwareVersionsMqc.yaml
   """
 }
 
@@ -486,7 +486,7 @@ process outputDocumentation {
 
   script:
   """
-  apMarkdownToHtml.py $outputDocs -o resultsDescription.html
+  markdown_to_html.py $outputDocs -o resultsDescription.html
   """
 }
 
