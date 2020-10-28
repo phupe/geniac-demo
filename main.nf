@@ -158,7 +158,9 @@ else if(params.readPaths){
 
 // Make sample plan if not available
 if (params.samplePlan){
-  samplePlanCh = Channel.fromPath(params.samplePlan)
+  Channel
+    .fromPath(params.samplePlan)
+    .into{ samplePlanCh; samplePlanCheckCh }
 }else if(params.readPaths){
   if (params.singleEnd){
     Channel
@@ -166,14 +168,14 @@ if (params.samplePlan){
       .collectFile() {
         item -> ["samplePlan.csv", item[0] + ',' + item[0] + ',' + item[1][0] + '\n']
        }
-      .set{ samplePlanCh }
+      .into{ samplePlanCh; samplePlanCheckCh }
   }else{
      Channel
        .from(params.readPaths)
        .collectFile() {
          item -> ["samplePlan.csv", item[0] + ',' + item[0] + ',' + item[1][0] + ',' + item[1][1] + '\n']
         }
-       .set{ samplePlanCh }
+       .into{ samplePlanCh; samplePlanCheckCh }
   }
 }else{
   if (params.singleEnd){
@@ -182,17 +184,16 @@ if (params.samplePlan){
       .collectFile() {
         item -> ["samplePlan.csv", item[0] + ',' + item[0] + ',' + item[1][0] + '\n']
        }
-      .set { samplePlanCh }
+      .into { samplePlanCh; samplePlanCheckCh }
   }else{
     Channel
       .fromFilePairs( params.reads, size: 2 )
       .collectFile() {
         item -> ["samplePlan.csv", item[0] + ',' + item[0] + ',' + item[1][0] + ',' + item[1][1] + '\n']
       }
-      .set { samplePlanCh }
+      .into { samplePlanCh; samplePlanCheckCh }
    }
 }
-
 
 /***************
  * Design file *
@@ -204,18 +205,18 @@ if (params.design){
   Channel
     .fromPath(params.design)
     .ifEmpty { exit 1, "Design file not found: ${params.design}" }
-    .into { designCh ; designControlCh }
+    .into { designCheckCh ; designCh }
 
-  designControlCh
+  designCh
     .splitCsv(header:true)
     .map { row ->
       if(row.AGE==""){row.AGE='NA'}
       return [ row.SAMPLE_ID, row.AGE, row.TYPE ]
      }
-    .set { designControlCh }
+    .set { designCh }
 }else{
+  designCheckCh = Channel.empty()
   designCh = Channel.empty()
-  designControlCh = Channel.empty()
 }
 
 /*******************
@@ -429,7 +430,7 @@ process multiqc {
 
   output: 
   file splan
-  file "*_report.html" into multiqcReportCh
+  //file "*_report.html" into multiqcReportCh
   //file "*_data"
 
   script:
@@ -448,6 +449,26 @@ process multiqc {
 /****************
  * Sub-routines *
  ****************/
+
+process checkDesign{
+  label 'python'
+  label 'lowCpu'
+  label 'lowMem'
+  publishDir "${params.summaryDir}/", mode: 'copy'
+
+  when:
+  params.design
+
+  input:
+  file design from designCheckCh
+  file samplePlan from samplePlanCheckCh
+
+  script:
+  optSE = params.singleEnd ? "--singleEnd" : ""
+  """
+  #apCheckDesign.py -d $design -s $samplePlan --baseDir ${baseDir} ${optSE}
+  """
+}
 
 process outputDocumentation {
   label 'python'

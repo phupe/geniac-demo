@@ -1,17 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
-#
-#  This file is part of multiQC software. Using a metadata file, it writes part of the multiQC config file
-#
-#  Copyright (c) 2018 - Institut Curie
-#
-#  File author(s):
-#      Dimitri Desvillechabrol <dimitri.desvillechabrol@curie.fr>,
-#      Nicolas Servant <nicolas.servant@curie.fr>
-#
-#  Distributed under the terms of the CeCILL-B license.
-#  The full license is in the LICENSE file, distributed with this software.
-#
+
+##############################################################################
+# Copyright Institut Curie 2020
+# This software is a computer program whose purpose is to analyze high-throughput sequencing data.
+# You can use, modify and/ or redistribute the software under the terms of license (see the LICENSE file for more details).
+# The software is distributed in the hope that it will be useful, but "AS IS" WITHOUT ANY WARRANTY OF ANY KIND.
+# Users are therefore encouraged to test the software's suitability as regards their requirements in conditions enabling the security of their systems and/or data.
+# The fact that you are presently reading this means that you have had knowledge of the license and that you accept its terms.
 ##############################################################################
 
 import os
