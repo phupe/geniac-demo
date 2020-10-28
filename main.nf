@@ -439,7 +439,7 @@ process multiqc {
   metadataOpts = params.metadata ? "--metadata ${metadata}" : ""
   //isPE = params.singleEnd ? "" : "-p"
   designOpts = params.design ? "-d ${params.design}" : ""
-  modulesList = "-m custom_content"
+  modulesList = "-m custom_content -m fastqc"
   """
   apMqcHeader.py --splan ${splan} --name "PIPELINE" --version "${workflow.manifest.version}" ${metadataOpts} > multiqc-config-header.yaml
   multiqc . -f $rtitle $rfilename -c multiqc-config-header.yaml -c $multiqcConfig $modulesList
