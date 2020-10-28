@@ -10,6 +10,11 @@
     * [`-profile`](#-profile)
     * [`--reads`](#-reads)
     * [`--samplePlan`](#-sampleplan)
+	* [`--design`](#--design) 
+* [Inputs](#inputs)
+    * [`--singleEnd`](#--singleend)
+* [Reference genomes](#reference-genomes)
+    * [`--genome`](#--genome)
 * [Nextflow profiles](#nextflow-profiles)
 * [Job resources](#job-resources)
 * [Other command line parameters](#other-command-line-parameters)
@@ -95,6 +100,53 @@ The sample plan is a csv file with the following information (and no header) :
 Sample ID | Sample Name | /path/to/R1/fastq/file | /path/to/R2/fastq/file (for paired-end only)
 ```
 
+### `--design`
+
+Specify a `design` file for extended analysis.
+
+```bash
+--design 'path/to/data/design.csv'
+```
+
+A design control is a csv file that list all experimental samples, their IDs, the associated control as well as any other useful metadata.
+The design is expected to be created with the following header :
+
+```bash
+SAMPLE_ID | CONTROL_ID 
+```
+
+The `--samplePlan` and the `--design` will be checked by the pipeline and have to be rigorously defined in order to make the pipeline work.  
+If the `design` file is not specified, the pipeline will run over the first steps but the downstream analysis will be ignored.
+
+## Inputs
+
+### `--singleEnd`
+
+By default, the pipeline expects paired-end data. If you have single-end data, you need to specify `--singleEnd` on the command line when you launch the pipeline. A normal glob pattern, enclosed 
+in quotation marks, can then be used for `--reads`. For example:
+
+```bash
+--singleEnd --reads '*.fastq.gz'
+```
+
+## Reference Genomes
+
+All information about genomes and annotation are available in [ReferenceGenome](referenceGenome.md).
+
+### `-genome`
+
+There are different species supported in the genomes references file. To run the pipeline, you must specify which to use with the `--genome` flag.
+
+You can find the keys to specify the genomes in the [genomes config file](../conf/genomes.config). Common genomes that are supported are:
+
+* Human
+  * `--genome hg38`
+* Mouse
+   * `--genome mm10`
+	
+> There are numerous others - check the config file for more.
+
+
 ## Nextflow profiles
 
 Different Nextflow profiles can be used. See [Profiles](profiles.md) for details.
@@ -111,7 +163,8 @@ For most of the steps in the pipeline, if the job exits with an error code of `1
 The pipeline is made with a few *skip* options that allow to skip optional steps in the workflow.
 The following options can be used:
 * `--skipFastqc`
-
+* `--skipMultiqc`
+				
 ### `--metadata`
 Specify a two-columns (tab-delimited) metadata file to diplay in the final Multiqc report.
 
