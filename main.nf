@@ -407,6 +407,28 @@ process getSoftwareVersions{
   """
 }
 
+process workflowSummaryMqc {
+  when:
+  !params.skipMultiQC
+
+  output:
+  file 'workflowSummaryMqc.yaml' into workflowSummaryYamlCh
+
+  exec:
+  def yaml_file = task.workDir.resolve('workflowSummaryMqc.yaml')
+  yaml_file.text  = """
+  id: 'summary'
+  description: " - this information is collected when the pipeline is started."
+  section_name: 'Workflow Summary'
+  section_href: "${workflow.manifest.homePage}"
+  plot_type: 'html'
+  data: |
+        <dl class=\"dl-horizontal\">
+  ${summary.collect { k,v -> "            <dt>$k</dt><dd><samp>${v ?: '<span style=\"color:#999999;\">N/A</a>'}</samp></dd>" }.join("\n")}
+        </dl>
+  """.stripIndent()
+}
+
 /***********
  * MultiQC *
  ***********/
@@ -427,6 +449,7 @@ process multiqc {
   //file design from designMqcCh.collect().ifEmpty([])
   file metadata from metadataCh.ifEmpty([])
   file ('softwareVersions/*') from softwareVersionsYamlCh.collect().ifEmpty([])
+  file ('workflowSummary/*') from workflowSummaryYamlCh.collect()
 
   output: 
   file splan
