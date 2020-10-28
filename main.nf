@@ -49,6 +49,7 @@ def helpMessage() {
 
   Skip options: All are false by default
     --skipSoftVersion [bool]      Do not report software version
+    --skipMultiQC [bool]          Skips MultiQC
 
   Other options:
     --outDir [file]               The output directory where the results will be saved
@@ -256,8 +257,7 @@ process fastqc {
   label 'smallCpu'
 
   tag "${prefix}"
-  publishDir "${params.outDir}/fastqc", mode: 'copy',
-      saveAs: {filename -> filename.indexOf(".zip") > 0 ? "zips/$filename" : "$filename"}
+  publishDir "${params.outDir}/fastqc", mode: 'copy'
 
   input:
   set val(prefix), file(reads) from rawReadsFastqcCh
@@ -267,12 +267,9 @@ process fastqc {
   file "v_fastqc.txt" into fastqcVersionCh
 
   script:
-  pbase = reads[0].toString() - ~/(\.fq)?(\.fastq)?(\.gz)?$/
   """
   fastqc -q $reads
   fastqc --version > v_fastqc.txt
-  mv ${pbase}_fastqc.html ${prefix}_fastqc.html
-  mv ${pbase}_fastqc.zip ${prefix}_fastqc.zip
   """
 }
 
@@ -409,6 +406,44 @@ process getSoftwareVersions{
   """
 }
 
+/***********
+ * MultiQC *
+ ***********/
+
+process multiqc {
+  label 'multiqc'
+  label 'lowCpu'
+  label 'lowMem'
+  publishDir "${params.outDir}/MultiQC", mode: 'copy'
+
+  when:
+  !params.skipMultiQC
+
+  input:
+  file splan from samplePlanCh.collect()
+  file multiqcConfig from multiqcConfigCh
+  file ('fastqc/*') from fastqcResultsCh.collect().ifEmpty([])
+  //file design from designMqcCh.collect().ifEmpty([])
+  file metadata from metadataCh.ifEmpty([])
+  file ('softwareVersions/*') from softwareVersionsYamlCh.collect().ifEmpty([])
+
+  output: 
+  file splan
+  file "*_report.html" into multiqcReportCh
+  //file "*_data"
+
+  script:
+  rtitle = customRunName ? "--title \"$customRunName\"" : ''
+  rfilename = customRunName ? "--filename " + customRunName + "_report" : "--filename report"
+  metadataOpts = params.metadata ? "--metadata ${metadata}" : ""
+  //isPE = params.singleEnd ? "" : "-p"
+  designOpts = params.design ? "-d ${params.design}" : ""
+  modulesList = "-m custom_content"
+  """
+  apMqcHeader.py --splan ${splan} --name "PIPELINE" --version "${workflow.manifest.version}" ${metadataOpts} > multiqc-config-header.yaml
+  multiqc . -f $rtitle $rfilename -c multiqc-config-header.yaml -c $multiqcConfig $modulesList
+  """
+}
 
 /****************
  * Sub-routines *
