@@ -42,7 +42,7 @@ if re.match(r".*dev$", args.version):
     multiqc_list +=["report_comment: >\n This software is currently under active development and the results have been generated with a non stable version. The reliability, reproducibility and the quality of the results are therefore not guaranteed."]
 
 multiqc_list += ["custom_logo: '{}'".format(os.sep.join([
-    os.path.dirname(os.path.realpath(__file__)), '../assets/institutCurieLogo.png']))]
+    os.path.dirname(os.path.realpath(__file__)), '../assets/geniacLogo.png']))]
 multiqc_list += ["custom_logo_title: Institut Curie"]
 multiqc_list += ["custom_logo_url: https://science.curie.fr/plateformes/sequencage-adn-haut-debit-ngs/"]
 
