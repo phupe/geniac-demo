@@ -412,10 +412,10 @@ process workflowSummaryMqc {
   !params.skipMultiQC
 
   output:
-  file 'workflowSummaryMqc.yaml' into workflowSummaryYamlCh
+  file 'workflowSummary_mqc.yaml' into workflowSummaryYamlCh
 
   exec:
-  def yaml_file = task.workDir.resolve('workflowSummaryMqc.yaml')
+  def yaml_file = task.workDir.resolve('workflowSummary_mqc.yaml')
   yaml_file.text  = """
   id: 'summary'
   description: " - this information is collected when the pipeline is started."
