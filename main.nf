@@ -403,13 +403,13 @@ process getSoftwareVersions{
   file 'v_fastqc.txt' from fastqcVersionCh.first().ifEmpty([])
 
   output:
-  file 'softwareVersionsMqc.yaml' into softwareVersionsYamlCh
+  file 'softwareVersions_mqc.yaml' into softwareVersionsYamlCh
 
   script:
   """
   echo $workflow.manifest.version &> v_pipeline.txt
   echo $workflow.nextflow.version &> v_nextflow.txt
-  scrape_software_versions.py &> softwareVersionsMqc.yaml
+  scrape_software_versions.py &> softwareVersions_mqc.yaml
   """
 }
 

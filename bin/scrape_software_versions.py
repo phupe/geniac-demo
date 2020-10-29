@@ -28,7 +28,7 @@ for k, v in regexes.items():
 # Dump to YAML
 print ('''
 id: 'Pipeline software versions'
-section_name: 'Software versions'
+section_name: 'Software Versions'
 section_href: 'https://geniac.readthedocs.io'
 plot_type: 'html'
 description: 'are collected at run time from the software output.'
