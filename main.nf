@@ -474,7 +474,7 @@ process multiqc {
   designOpts = params.design ? "-d ${params.design}" : ""
   modulesList = "-m custom_content -m fastqc"
   """
-  apMqcHeader.py --splan ${splan} --name "geniac demo" --version "${workflow.manifest.version}" ${metadataOpts} > multiqc-config-header.yaml
+  apMqcHeader.py --splan ${splan} --name "${workflow.manifest.name}" --version "${workflow.manifest.version}" ${metadataOpts} > multiqc-config-header.yaml
   multiqc . -f $rtitle $rfilename -c multiqc-config-header.yaml -c $multiqcConfig $modulesList
   """
 }
