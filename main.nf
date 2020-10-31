@@ -301,7 +301,7 @@ process alpine {
   script:
   """
   source ${baseDir}/env/alpine.env
-  echo "Hello from alpine: \$(date). This is very high here: \${peak_height}!" > alpine_${x}.txt
+  echo "Hello from alpine: \$(date). This is very high here: \${PEAK_HEIGHT}!" > alpine_${x}.txt
   """
 }
 
