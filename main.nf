@@ -456,7 +456,6 @@ process multiqc {
   file splan from samplePlanCh.collect()
   file multiqcConfig from multiqcConfigCh
   file ('fastqc/*') from fastqcResultsCh.collect().ifEmpty([])
-  //file design from designMqcCh.collect().ifEmpty([])
   file metadata from metadataCh.ifEmpty([])
   file ('softwareVersions/*') from softwareVersionsYamlCh.collect().ifEmpty([])
   file ('workflowSummary/*') from workflowSummaryYamlCh.collect()
@@ -470,7 +469,6 @@ process multiqc {
   rtitle = customRunName ? "--title \"$customRunName\"" : ''
   rfilename = customRunName ? "--filename " + customRunName + "_report" : "--filename report"
   metadataOpts = params.metadata ? "--metadata ${metadata}" : ""
-  //isPE = params.singleEnd ? "" : "-p"
   designOpts = params.design ? "-d ${params.design}" : ""
   modulesList = "-m custom_content -m fastqc"
   """
