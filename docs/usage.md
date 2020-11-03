@@ -91,7 +91,7 @@ If left unspecified, a default pattern is used: `data/*{1,2}.fastq.gz`
 Use this to specify a sample plan file instead of a regular expression to find fastq files. For example :
 
 ```bash
---samplePlan 'path/to/data/sample_plan.csv
+--samplePlan 'path/to/data/samplePlan.csv
 ```
 
 The sample plan is a csv file with the following information (and no header) :
