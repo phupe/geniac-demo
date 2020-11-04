@@ -36,7 +36,7 @@ def helpMessage() {
   }
 
   log.info """
-  @git_repo_name@ v${workflow.manifest.version}
+  @git_repo_name@ version: ${workflow.manifest.version}
   ======================================================================
 
   Usage:
@@ -230,7 +230,7 @@ if (params.design){
  *******************/
 
 if ("${workflow.manifest.version}" =~ /dev/ ){
-   log.info devMessageFile.text
+  log.info devMessageFile.text
 }
 
 log.info """=======================================================
