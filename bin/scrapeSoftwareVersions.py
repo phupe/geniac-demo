@@ -1,6 +1,5 @@
-# script from https://nf-co.re/
-
 #!/usr/bin/env python
+# script from https://nf-co.re/
 from __future__ import print_function
 from collections import OrderedDict
 import re
