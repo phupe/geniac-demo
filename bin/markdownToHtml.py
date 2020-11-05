@@ -1,11 +1,11 @@
-# script from https://nf-co.re/
-
 #!/usr/bin/env python
+# script from https://nf-co.re/
 from __future__ import print_function
 import argparse
 import markdown
 import os
 import sys
+
 
 def convert_markdown(in_fn):
     input_md = open(in_fn, mode="r", encoding="utf-8").read()
