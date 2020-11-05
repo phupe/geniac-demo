@@ -409,7 +409,7 @@ process getSoftwareVersions{
   """
   echo $workflow.manifest.version &> v_pipeline.txt
   echo $workflow.nextflow.version &> v_nextflow.txt
-  scrape_software_versions.py &> softwareVersions_mqc.yaml
+  scrapeSoftwareVersions.py &> softwareVersions_mqc.yaml
   """
 }
 
@@ -472,7 +472,7 @@ process multiqc {
   designOpts = params.design ? "-d ${params.design}" : ""
   modulesList = "-m custom_content -m fastqc"
   """
-  apMqcHeader.py --splan ${splan} --name "${workflow.manifest.name}" --version "${workflow.manifest.version}" ${metadataOpts} > multiqc-config-header.yaml
+  mqcHeader.py --splan ${splan} --name "${workflow.manifest.name}" --version "${workflow.manifest.version}" ${metadataOpts} > multiqc-config-header.yaml
   multiqc . -f $rtitle $rfilename -c multiqc-config-header.yaml -c $multiqcConfig $modulesList
   """
 }
@@ -497,7 +497,7 @@ process checkDesign{
   script:
   optSE = params.singleEnd ? "--singleEnd" : ""
   """
-  apCheckDesign.py -d $design -s $samplePlan ${optSE}
+  checkDesign.py -d $design -s $samplePlan ${optSE}
   """
 }
 
@@ -517,7 +517,7 @@ process outputDocumentation {
 
   script:
   """
-  markdown_to_html.py $outputDocs -o resultsDescription.html
+  markdownToHtml.py $outputDocs -o resultsDescription.html
   """
 }
 
