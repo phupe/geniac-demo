@@ -235,7 +235,7 @@ if ("${workflow.manifest.version}" =~ /dev/ ){
 
 log.info """=======================================================
 
-@git_repo_name@ workflow v${workflow.manifest.version}
+@git_repo_name@ workflow version: ${workflow.manifest.version}
 ======================================================="""
 def summary = [:]
 
