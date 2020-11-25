@@ -94,6 +94,16 @@ if (params.genomes && params.genome && !params.genomes.containsKey(params.genome
   exit 1, "The provided genome '${params.genome}' is not available in the genomes.config file. Currently the available genomes are ${params.genomes.keySet().join(", ")}"
 }
 
+params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
+
+if ( params.fasta ){
+Channel.fromPath(params.fasta)
+  .ifEmpty { exit 1, "Reference annotation not found: ${params.fasta}" }
+  .set { fastaCh }
+}else{
+  fastaCh = Channel.empty()
+}
+
 // Has the run name been specified by the user?
 // this has the bonus effect of catching both -name and --name
 customRunName = params.name
@@ -260,8 +270,8 @@ log.info "========================================="
 
 process fastqc {
   label 'fastqc'
-  label 'smallMem'
-  label 'smallCpu'
+  label 'lowMem'
+  label 'lowCpu'
 
   tag "${prefix}"
   publishDir "${params.outDir}/fastqc", mode: 'copy'
@@ -311,8 +321,8 @@ process alpine {
 
 process helloWorld {
   label 'helloWorld'
-  label 'smallMem'
-  label 'smallCpu'
+  label 'minMem'
+  label 'minCpu'
   publishDir "${params.outDir}/helloWorld", mode: 'copy'
 
   output:
@@ -330,8 +340,8 @@ process helloWorld {
 
 process standardUnixCommand {
   label 'onlyLinux'
-  label 'smallMem'
-  label 'smallCpu'
+  label 'minMem'
+  label 'minCpu'
   publishDir "${params.outDir}/standardUnixCommand", mode: 'copy'
 
   input:
@@ -352,8 +362,8 @@ process standardUnixCommand {
 
 process execBinScript {
   label 'onlyLinux'
-  label 'smallMem'
-  label 'smallCpu'
+  label 'minMem'
+  label 'minCpu'
   publishDir "${params.outDir}/execBinScript", mode: 'copy'
 
   output:
@@ -373,8 +383,8 @@ process execBinScript {
 
 process trickySoftware {
   label 'trickySoftware'
-  label 'smallMem'
-  label 'smallCpu'
+  label 'minMem'
+  label 'minCpu'
   publishDir "${params.outDir}/trickySoftware", mode: 'copy'
 
   output:
@@ -392,8 +402,8 @@ process trickySoftware {
 
 process getSoftwareVersions{
   label 'python'
-  label 'lowCpu'
-  label 'lowMem'
+  label 'minCpu'
+  label 'minMem'
   publishDir path: "${params.outDir}/softwareVersions", mode: "copy"
 
   when:
@@ -445,8 +455,8 @@ process workflowSummaryMqc {
 
 process multiqc {
   label 'multiqc'
-  label 'lowCpu'
-  label 'lowMem'
+  label 'minCpu'
+  label 'minMem'
   publishDir "${params.outDir}/MultiQC", mode: 'copy'
 
   when:
@@ -483,8 +493,8 @@ process multiqc {
 
 process checkDesign{
   label 'python'
-  label 'lowCpu'
-  label 'lowMem'
+  label 'minCpu'
+  label 'minMem'
   publishDir "${params.summaryDir}/", mode: 'copy'
 
   when:
@@ -503,8 +513,8 @@ process checkDesign{
 
 process outputDocumentation {
   label 'python'
-  label 'lowCpu'
-  label 'lowMem'
+  label 'minCpu'
+  label 'minMem'
 
   publishDir "${params.summaryDir}/", mode: 'copy'
 
@@ -581,7 +591,7 @@ workflow.onComplete {
 
   // final logs
   if(workflow.success){
-      log.info "Pipeline Complete"
+    log.info "Pipeline Complete"
   }else{
     log.info "FAILED: $workflow.runName"
   }
