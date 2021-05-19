@@ -1,8 +1,9 @@
-version-0.1.3
-05/11/2021
+version-0.2.0
+05/19/2021
 
 NEW FEATURES
   - New default values for singularityRunOptions and dockerRunOptions
+  - update with geniac version-0.2.1
 
 version-0.1.2
 12/11/2020
