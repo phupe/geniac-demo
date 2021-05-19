@@ -298,8 +298,8 @@ process fastqc {
 oneToFiveCh = Channel.of(1..5)
 process alpine {
   label 'alpine'
-  label 'smallMem'
-  label 'smallCpu'
+  label 'minMem'
+  label 'minCpu'
   publishDir "${params.outDir}/alpine", mode: 'copy'
 
   input:
@@ -428,6 +428,7 @@ process getSoftwareVersions{
  ********************/
 
 process workflowSummaryMqc {
+  label 'onlyLinux'
   when:
   !params.skipMultiQC
 
