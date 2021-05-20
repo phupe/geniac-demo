@@ -1,5 +1,14 @@
+version-0.2.1
+20/05/2021
+
+NEW FEATURES
+  - update with geniac version-0.2.2
+
+BUG FIXES
+  - params.geniac.containers.git must not be empty
+
 version-0.2.0
-05/19/2021
+19/05/2021
 
 NEW FEATURES
   - New default values for singularityRunOptions and dockerRunOptions
