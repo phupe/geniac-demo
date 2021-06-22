@@ -28,7 +28,7 @@ This script is based on the nf-core guidelines. See https://nf-co.re/ for more i
 */
 
 // File with text to display when a developement version is used
-devMessageFile = file("$baseDir/assets/devMessage.txt")
+devMessageFile = file("$projectDir/assets/devMessage.txt")
 
 def helpMessage() {
   if ("${workflow.manifest.version}" =~ /dev/ ){
@@ -113,8 +113,8 @@ if( !(workflow.runName ==~ /[a-z]+_[a-z]+/) ){
 
 // Stage config files
 multiqcConfigCh = Channel.fromPath(params.multiqcConfig)
-outputDocsCh = file("$baseDir/docs/output.md", checkIfExists: true)
-outputDocsImagesCh = file("$baseDir/docs/images/", checkIfExists: true)
+outputDocsCh = file("$projectDir/docs/output.md", checkIfExists: true)
+outputDocsImagesCh = file("$projectDir/docs/images/", checkIfExists: true)
 
 /************
  * CHANNELS *
@@ -310,7 +310,7 @@ process alpine {
 
   script:
   """
-  source ${baseDir}/env/alpine.env
+  source ${projectDir}/env/alpine.env
   echo "Hello from alpine: \$(date). This is very high here: \${PEAK_HEIGHT}!" > alpine_${x}.txt
   """
 }
@@ -558,12 +558,12 @@ workflow.onComplete {
 
   // Render the TXT template
   def engine = new groovy.text.GStringTemplateEngine()
-  def tf = new File("$baseDir/assets/workflowOnCompleteTemplate.txt")
+  def tf = new File("$projectDir/assets/workflowOnCompleteTemplate.txt")
   def txtTemplate = engine.createTemplate(tf).make(reportFields)
   def reportTxt = txtTemplate.toString()
 
   // Render the HTML template
-  def hf = new File("$baseDir/assets/workflowOnCompleteTemplate.html")
+  def hf = new File("$projectDir/assets/workflowOnCompleteTemplate.html")
   def htmlTemplate = engine.createTemplate(hf).make(reportFields)
   def reportHtml = htmlTemplate.toString()
 
