@@ -1,5 +1,4 @@
-# Nextflow pipeline 
-<!-- TODO update with the name of the pipeline -->
+# Geniac-demo pipeline 
 
 [![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A519.10.0-brightgreen.svg)](https://www.nextflow.io/)
 [![Install with](https://anaconda.org/anaconda/conda-build/badges/installer/conda.svg)](https://conda.anaconda.org/anaconda)
@@ -8,20 +7,27 @@
 
 ## Introduction
 
+This is a demo pipeline with the best practises for the development of bioinformatics analysis pipelines with [Nextflow](https://www.nextflow.io) and [geniac](https://github.com/bioinfo-pf-curie/geniac) (Automatic Configuration GENerator and Installer for nextflow pipeline). 
+
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow manager to run tasks across multiple compute infrastructures in a very portable manner.
-It supports [conda](https://docs.conda.io) package manager and  [singularity](https://sylabs.io/guides/3.6/user-guide/) / [Docker](https://www.docker.com/) containers making installation easier and results highly reproducible.
 
-## Pipeline summary
+It supports [conda](https://docs.conda.io) package manager and  [singularity](https://sylabs.io/) / [Docker](https://www.docker.com/) containers making installation easier and results highly reproducible.
 
-<!-- TODO 
 
-Describe here the main steps of the pipeline.
+## Quick start
 
-1. Step 1 does...
-2. Step 2 does...
-3. etc
+```bash
+conda create -n geniac-cli python=3.9
+conda activate geniac-cli
+pip install git+https://github.com/bioinfo-pf-curie/geniac.git@release
+```
 
--->
+
+```bash
+geniac init ${HOME}/tmp/try-geniac-demo https://github.com/bioinfo-pf-curie/geniac-demo.git
+geniac install ${HOME}/tmp/try-geniac-demo/install
+geniac test conda
+```
 
 ### Quick help
 
@@ -158,10 +164,27 @@ For more details see  [Reference genomes](docs/referenceGenomes.md).
 4. [Output and how to interpret the results](docs/output.md)
 5. [Troubleshooting](docs/troubleshooting.md)
 
-## Credits
 
-This pipeline has been written by <!-- TODO -->
+*Geniac* is an **A**utomatic **C**onfiguration **GEN**erator and **I**nstaller for nextflow pipelines.
 
-## Contacts
+* [Documentation](#documentation)
+* [Acknowledgements](#acknowledgements)
+* [Release notes](CHANGELOG)
+* [Citation](#citation)
 
-For any question, bug or suggestion, please use the issue system or contact the bioinformatics core facility.
+## Documentation
+
+* The [geniac documentation](https://geniac.readthedocs.io) provides a set of best practises to implement *Nextflow* pipelines.
+* The [geniac](https://github.com/bioinfo-pf-curie/geniac) source code provides the set of utilities.
+* The [geniac demo](https://github.com/bioinfo-pf-curie/geniac-demo) provides a toy pipeline to test and practise *Geniac*.
+* The [geniac template](https://github.com/bioinfo-pf-curie/geniac-template) provides a pipeline template to start a new pipeline.
+
+## Acknowledgements
+
+* [Institut Curie](https://www.curie.fr)
+* [Centre national de la recherche scientifique](http://www.cnrs.fr)
+* This project has received funding from the European Union’s Horizon 2020 research and innovation programme and the Canadian Institutes of Health Research under the grant agreement No 825835 in the framework on the [European-Canadian Cancer Network](https://eucancan.com/)
+
+## Citation
+
+[Allain F, Roméjon J, La Rosa P et al. Geniac: Automatic Configuration GENerator and Installer for nextflow pipelines. Open Research Europe 2021, 1:76](https://open-research-europe.ec.europa.eu/articles/1-76)
