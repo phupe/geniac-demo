@@ -114,7 +114,6 @@ if( !(workflow.runName ==~ /[a-z]+_[a-z]+/) ){
 // Stage config files
 multiqcConfigCh = Channel.fromPath(params.multiqcConfig)
 outputDocsCh = file("$projectDir/docs/output.md", checkIfExists: true)
-outputDocsImagesCh = file("$projectDir/docs/images/", checkIfExists: true)
 
 /************
  * CHANNELS *
@@ -521,7 +520,6 @@ process outputDocumentation {
 
   input:
   file outputDocs from outputDocsCh
-  file images from outputDocsImagesCh
 
   output:
   file "resultsDescription.html"
