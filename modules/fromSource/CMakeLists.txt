@@ -19,8 +19,8 @@ ExternalProject_Add(
 ###########################################################################
 
 # IMPORTANT: DESTINATION for install must always be ${CMAKE_INSTALL_PREFIX}/${pipeline_dir}/bin/fromSource
-    install(
-        DIRECTORY ${CMAKE_BINARY_DIR}/externalProject/bin/
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/${pipeline_dir}/bin/fromSource
-        USE_SOURCE_PERMISSIONS)
+install(
+    DIRECTORY ${CMAKE_BINARY_DIR}/externalProject/bin/
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/${pipeline_dir}/bin/fromSource
+    USE_SOURCE_PERMISSIONS)
 
