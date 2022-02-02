@@ -28,8 +28,8 @@ This pipeline illustrates how [geniac](https://github.com/bioinfo-pf-curie/genia
 
 * git (>= 2.0) [required]
 * cmake (>= 3.0) [required]
-* Nextflow (>= 20.01) [required]
-* Singularity (>= 3.2) [optional]
+* Nextflow (>= 21.10.6) [required]
+* Singularity (>= 3.8.5) [optional]
 * Docker (>= 18.0) [optional]
 
 Install [Nextflow](https://www.nextflow.io/docs/latest/getstarted.html#installation):
@@ -47,7 +47,7 @@ bash Miniconda3-latest-Linux-x86_64.sh
 ### Install the geniac command line interface
 
 ```bash
-conda create -n geniac-cli python=3.9
+conda create -n geniac-cli python=3.10
 conda activate geniac-cli
 pip install git+https://github.com/bioinfo-pf-curie/geniac.git@release
 ```
@@ -55,9 +55,22 @@ pip install git+https://github.com/bioinfo-pf-curie/geniac.git@release
 ### Check the code, install and run the pipeline with the multiconda profile
 
 ```bash
-geniac init ${HOME}/tmp/myPipeline https://github.com/bioinfo-pf-curie/geniac-demo.git
-geniac lint src
-geniac install ${HOME}/tmp/myPipeline/install
+export WORK_DIR="${HOME}/tmp/myPipeline"
+export INSTALL_DIR="${WORK_DIR}/install"
+export GIT_URL="https://github.com/bioinfo-pf-curie/geniac-demo.git"
+
+# Initialization of a working directory
+# with the src and build folders
+geniac init -w ${WORK_DIR} ${GIT_URL}
+cd ${WORK_DIR}
+
+# Check the code
+geniac lint
+
+# Install the pipeline
+geniac install . ${INSTALL_DIR}
+
+# Test the pipeline with the multiconda profile
 geniac test multiconda
 ```
 
@@ -66,10 +79,24 @@ geniac test multiconda
 Note that you need `sudo` privilege to build the singularity images.
 
 ```bash
-geniac init ${HOME}/tmp/myPipeline https://github.com/bioinfo-pf-curie/geniac-demo.git
-geniac lint src
-geniac install+singularity ${HOME}/tmp/myPipeline/install
+export WORK_DIR="${HOME}/tmp/myPipeline"
+export INSTALL_DIR="${WORK_DIR}/install"
+export GIT_URL="https://github.com/bioinfo-pf-curie/geniac-demo.git"
+
+# Initialization of a working directory
+# with the src and build folders
+geniac init -w ${WORK_DIR} ${GIT_URL}
+cd ${WORK_DIR}
+
+# Install the pipeline with the singularity images
+geniac install . ${INSTALL_DIR} -m singularity
+sudo chown -R  $(id -gn):$(id -gn) build
+
+# Test the pipeline with the singularity profile
 geniac test singularity
+
+# Test the pipeline with the singularity and cluster profiles
+geniac test singularity --check-cluster
 ```
 
 ### Advanced users
