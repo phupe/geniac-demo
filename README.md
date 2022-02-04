@@ -32,24 +32,20 @@ This pipeline illustrates how [geniac](https://github.com/bioinfo-pf-curie/genia
 * Singularity (>= 3.8.5) [optional]
 * Docker (>= 18.0) [optional]
 
-Install [Nextflow](https://www.nextflow.io/docs/latest/getstarted.html#installation):
-
-```bash
-curl -s https://get.nextflow.io | bash
-```
-
 Install [conda](https://docs.conda.io):
 ```bash
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh
 ```
 
-### Install the geniac command line interface
+### Install the geniac conda environment
 
 ```bash
-conda create -n geniac-cli python=3.10
-conda activate geniac-cli
-pip install git+https://github.com/bioinfo-pf-curie/geniac.git@release
+# Create the geniac conda environment
+export GENIAC_CONDA="https://raw.githubusercontent.com/bioinfo-pf-curie/geniac/release/environment.yml"
+wget ${GENIAC_CONDA}
+conda create env -f environment.yml
+conda activate geniac
 ```
 
 ### Check the code, install and run the pipeline with the multiconda profile
